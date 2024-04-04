@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+   <html>
+     <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root{
+            --bc :background-color: rgba(151, 22, 22, 0.103);
+
+        }
+        body{
+            box-sizing: border-box;
+            margin: 0rem;
+            background-color: black;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+        .grean{
+            background-color: green;
+        }
+        .red{
+            background-color: red;
+        }
+        .what{
+            background-color: hsl(19, 90%, 48%);
+        }
+        .loop{
+            width: 34vmax;
+            aspect-ratio: 1;
+            background: linear-gradient(to right, aquamarine, mediumpurple);
+            position: relative;
+            top: 25px;
+            z-index: -31;
+            background-color: white;
+            border-radius: 50%;
+            animation: rotate 6s infinite;
+            position: fixed;
+        }
+        .blob{
+            height: calc(100vh + 30px);
+            width: 100%;
+            position: fixed;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8vmax);
+            inset :0;
+        }
+        .card-in-out{
+            color: whitesmoke;
+            display: flex;
+            justify-content: space-around;
+        }
+       .cont-of-card{
+           position: relative;
+           height: 100%;
+           padding-inline: 2rem;
+           margin-top: 4rem;
+           z-index: 3;
+        }
+        #getme{
+            position: relative;
+            z-index: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            outline: none;
+            color: whitesmoke;
+            border-radius: 12px;
+
+        }
+        .contof{
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2rem;
+        }
+        @keyframes rotate {
+            from {
+                rotate: 0;
+            }
+            50% {
+               scale: 1.155; 
+            }
+            to{
+                rotate: 360deg;
+            } 
+        }
+        #all{
+            display: none;
+        }
+        .date > div{
+            color: whitesmoke   ;
+            justify-content: space-around;
+            font-size: 1.15em;
+            background:rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            display: flex;
+            position: relative;
+        }
+        .date  {
+            display: flex; 
+            justify-content: space-around;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        label{
+            position: relative;
+            width: 71px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 2;
+            display: grid;
+            place-items: center;
+            height: 50px;
+            color:whitesmoke;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        input{
+            display: none;
+        }
+        #hide{
+            display: flex;
+        }
+        @keyframes show {
+        0%{
+            opacity: 0;
+            left: -30px;
+        }
+        20%{
+            left: -20px;
+            opacity: 0.50;
+        }
+       30%,  50%{
+            left: -10px;
+            opacity: 1;
+        }
+        100%{
+            left: 0px;
+        }
+        }
+
+    </style>
+    <title>CSV File Reader</title>
+</head>
+<body>
+    
+    <div class="contof">        
+        <button id="getme">تفاصيل اكثر</button>
+        <label for="csvFileInput" class="cutstomfile"> اختر ملف
+            <input type="file" name="csvFileInput" id="csvFileInput" accept=".csv">
+        </label>
+    </div> 
+    <div class="blob"></div>
+    <div class="loop"></div>
+    <div class="cont-of-card">
+        <div class="card-in-out">
+            <h3> تاريخ الدخول</h3>
+              <h3 id="hide">تاريخ الخروج</h3>
+                 <h3 id="hide">وقت الدخول</h3>
+              <h3 id="hide">وقت الخروج</h3>
+            <h3>الاجمالي</h3>
+        </div>
+        <div class="date"> </div>
+    </div> 
+
+    <script>  
+       const DATA = {
+        '40' : [] , 
+        '34' : []
+       }  
+       
+       const NAMES = {
+        '40' : ['علي العطاس' , '300'],
+        '34' : ['الكلدي' ,'250'] 
+       }
+       // for know how many hourse must to be in time 
+       const hoursIn = {
+        '40' : [9.5 , 3], 
+        '34'  : [4 ,0]
+       }
+
+       
+       // to know if the user was not in the day at all
+       const days = new Set() ;
+
+       // how many  friday in this month ? 
+
+       const contFriday = () =>  {
+       let i = 0 ;
+       let today = new Date();
+       today = new Date(today.getFullYear() , today.getMonth()-1 , 24);
+       let prev = new Date(today.getFullYear() , today.getMonth() ,25 );
+       prev.setMonth(prev.getMonth()-1);
+       while(prev <= today){
+              days.add(lockelDate(prev));
+              if(prev.getDay() === 5){
+              i++ ;
+              days.delete(lockelDate(prev))
+            };
+        prev.setDate(prev.getDate() + 1);
+       }
+       return i;
+       };
+       // format the date for all mounth and day in 2 digt y/0d/0d
+       function lockelDate(date) {
+                const options = { year: 'numeric', day: '2-digit', month  : '2-digit' };
+                const formattedDate = date.toLocaleDateString('en-US', options);
+                return (formattedDate.slice(6) + '/' +formattedDate.slice(0,5) );
+        };
+
+       // reading the cvs file 
+        const  hi = document.getElementById('csvFileInput').addEventListener('change', handleFileSelect, true);
+        const conutFrid =  contFriday();
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function (e) {
+            const csvData = e.target.result;
+            parseCSV(csvData);
+        };            
+        };
+         function  parseCSV(csvData) {
+            const lines = csvData.split('\n');
+            const results = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const row = lines[i].split(',');
+
+                if (row == '') continue
+                
+                row[2] =  (row[2][0]  == 'i' ? 'in' : 'out' )
+
+                // clear the date to the right for Date class
+
+                row[1] = row[1].slice(0,10).split('/').reverse().join('/') + row[1].slice(10)
+                DATA[row[0]].push(row)                
+            }
+           for(const key in DATA){
+            // for get the all sellery for all the day 
+           const allDate = {}  
+           
+           addInHtml(NAMES[key][0] + '      المرتب : ' + NAMES[key][1])
+           const test =   invalidData(DATA[key]);
+           let end = 0 ;
+
+           for(let [indate , outdate] of test['data']){
+            //indate = [date : time in ] and same for outdate
+            
+            indate = indate.split(' ');
+            outdate = outdate.split(' ');
+
+            // calc all the minuts 
+            const Atest = calc( indate.join(' ') , outdate.join(' '));
+
+            // just for the alldate show 
+            allDate[indate[0]] = Atest + (  allDate[indate[0]] || 0)
+
+            // no nums under zero else is error in the cvs file
+            end += Math.max(0 , Atest) ;
+            addInHtml(indate[0] , outdate[0] , indate[1] , outdate[1] , Atest);
+           };
+
+           for(const datein in allDate ){
+            addInHtml(datein , allDate[datein]);
+
+           }
+            addInHtml( ` الغياب : ${test['dumy'].size}`, `اجمالي الدقائق المحسوبه في  الشهر كله  : ${end}` , `المرتب بحساب الدقائق  : ${getSalary(end,key)}`);
+           }
+          
+           
+        };
+        // add all the resluts in html 
+        function addInHtml(text1 , text2,  minutesIn , minutesOut , classname ){
+            const love = document.createElement('div');
+            
+            if(arguments.length == 2 ) love.id = 'all'
+            
+            if(arguments.length == 5) love.id = 'hide'
+            Array.from(arguments).forEach(e => {
+
+                const p = document.createElement('p');
+                      p.appendChild(document.createTextNode(e));
+                      love.appendChild(p);
+                     if(e <= 0){
+                      love.style.backgroundColor = ' rgba(238, 15, 15, 0.719)'
+                      love.classList.add('error')
+                      }
+            })
+            document.body.getElementsByClassName('date')[0].appendChild(love);
+        };
+        // cheak for all in and out date from csv
+              const invalidData  = (row) => {
+              const data = [];
+              let i = 0 ;
+              let j = 1;
+              const dumy = days
+              // cheak is ramdan or not for to not escape the tow deifrence date
+              const isRamadan = ramadan();
+
+              // tow pointers to shift any same or diffrent date and values
+             while( i <= j  && j < row.length){
+                  const dateI = row[i][1].slice(0,10);
+                  const dateJ = row[j][1].slice(0,10);
+                //clear the days if he in or out
+                dumy.delete(dateI);
+                dumy.delete(dateJ);
+
+                if((isRamadan || dateI == dateJ) && row[i][2]== 'in' && row[j][2] == 'out'){
+                data.push([row[i][1] ,row[j][1], row[i][2] , row[j][2]]);
+                i = j+1;
+                j += 2;
+                }
+
+                 else if (( dateI == dateJ) && row[i][2] == 'in' && row[j][2] == 'in') j++;
+ 
+                else{
+                i = j ;
+                j++;
+                }; 
+            };
+        return {data , dumy}  ;
+        };
+
+         function calc(inT , outT){
+           return  Math.floor((new Date(outT) - new Date(inT))  / 1000/60)
+        }
+
+        const ramadan = () => {
+         return new Intl.DateTimeFormat('ar-TN-u-ca-islamic', {day: 'numeric', month: 'long',weekday: 'long',year : 'numeric'}).format(Date.now()).toString().includes('رمضان')
+        }
+
+
+        const getSalary = (time , id) => {
+            const workedMinutes = time; 
+            const totalMinutes = ((30 * hoursIn[id][0] )  - (conutFrid * (hoursIn[id][0] - hoursIn[id][1]) ) )*60   
+
+            const percentage = (workedMinutes / totalMinutes) * 100;
+            return   Math.floor((percentage / 100) * NAMES[id][1])
+
+        }
+         // css things 
+        const rotate = document.getElementsByClassName('loop')[0]
+         window.onpointermove  =  e => {
+         window.pageXOffset
+         const {clientX , clientY} = e 
+               rotate.animate({
+               left: `${  ( clientX)}px`,
+               top: `${  ( clientY) }px`
+            }, { duration: 3000, fill: "forwards" });
+        }
+        let button = document.getElementById('getme')
+        button.addEventListener('click' , (e) => {
+        const allHide = [...document.querySelectorAll('#hide')]
+        allHide.forEach(e => {
+        e.style.display = e.style.display == 'none' ? 'flex' : 'none'
+         
+        })
+        const All = [...document.querySelectorAll('#all')]
+
+        All.forEach(e => {
+            e.style.display = e.style.display == 'flex' ? 'none' : 'flex'
+        })
+        })
+        this.addEventListener('click' , (e) =>{
+            if(e.target.classList[0] == 'error')  alert('هناك خطاء في الملف ')
+        })
+        
+    
+    </script>
+</body>
+</html>
