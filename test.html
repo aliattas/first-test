@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root{
-            --bc :background-color: rgba(151, 22, 22, 0.103);
-
-        }
+    
         body{
             box-sizing: border-box;
             margin: 0rem;
@@ -119,6 +116,9 @@
         }
         #hide{
             display: flex;
+        }
+        .error{
+        cursor: pointer;
         }
         @keyframes show {
         0%{
@@ -244,7 +244,7 @@
            let end = 0 ;
 
            for(let [indate , outdate] of test['data']){
-            //indate = [date : time in ] and same for outdate
+            //indate = [date , time in ] and same for outdate
             
             indate = indate.split(' ');
             outdate = outdate.split(' ');
@@ -255,7 +255,7 @@
             // just for the alldate show 
             allDate[indate[0]] = Atest + (  allDate[indate[0]] || 0)
 
-            // no nums under zero else is error in the cvs file
+            // the num must to be height then zero if is not then there is error in the cvs file
             end += Math.max(0 , Atest) ;
             addInHtml(indate[0] , outdate[0] , indate[1] , outdate[1] , Atest);
            };
@@ -288,7 +288,7 @@
             })
             document.body.getElementsByClassName('date')[0].appendChild(love);
         };
-        // cheak for all in and out date from csv
+              // cheak for all in and out date from csv
               const invalidData  = (row) => {
               const data = [];
               let i = 0 ;
@@ -301,7 +301,7 @@
              while( i <= j  && j < row.length){
                   const dateI = row[i][1].slice(0,10);
                   const dateJ = row[j][1].slice(0,10);
-                //clear the days if he in or out
+                //cheak if the user is in the day 
                 dumy.delete(dateI);
                 dumy.delete(dateJ);
 
@@ -332,6 +332,7 @@
 
         const getSalary = (time , id) => {
             const workedMinutes = time; 
+            // (month  * hourse of the wrok ) - (fridays * (hourse of work - hourse work in friday)) change to minutes
             const totalMinutes = ((30 * hoursIn[id][0] )  - (conutFrid * (hoursIn[id][0] - hoursIn[id][1]) ) )*60   
 
             const percentage = (workedMinutes / totalMinutes) * 100;
