@@ -235,22 +235,22 @@
                 row[1] = row[1].slice(0,10).split('/').reverse().join('/') + row[1].slice(10)
                 DATA[row[0]].push(row)                
             }
-           for(const key in DATA){
+           for( const key in DATA ){
             // for get the all sellery for all the day 
            const allDate = {}  
            
-           addInHtml(NAMES[key][0] + '      المرتب : ' + NAMES[key][1])
+           addInHtml( NAMES[key][0] + '      المرتب : ' + NAMES[key][1] )
            const test =   invalidData(DATA[key]);
            let end = 0 ;
 
-           for(let [indate , outdate] of test['data']){
+           for( let [indate , outdate] of test['data'] ){
             //indate = [date , time in ] and same for outdate
             
             indate = indate.split(' ');
             outdate = outdate.split(' ');
 
             // calc all the minuts 
-            const Atest = calc( indate.join(' ') , outdate.join(' '));
+            const Atest = calculatemMints( indate.join(' ') , outdate.join(' '));
 
             // just for the alldate show 
             allDate[indate[0]] = Atest + (  allDate[indate[0]] || 0)
@@ -260,8 +260,8 @@
             addInHtml(indate[0] , outdate[0] , indate[1] , outdate[1] , Atest);
            };
 
-           for(const datein in allDate ){
-            addInHtml(datein , allDate[datein]);
+           for( const datein in allDate  ){
+            addInHtml( datein , allDate[datein] );
 
            }
             addInHtml( ` الغياب : ${test['dumy'].size}`, `اجمالي الدقائق المحسوبه في  الشهر كله  : ${end}` , `المرتب بحساب الدقائق  : ${getSalary(end,key)}`);
@@ -273,9 +273,9 @@
         function addInHtml(text1 , text2,  minutesIn , minutesOut , classname ){
             const love = document.createElement('div');
             
-            if(arguments.length == 2 ) love.id = 'all'
+            if(arguments.length === 2 ) love.id = 'all'
             
-            if(arguments.length == 5) love.id = 'hide'
+            if(arguments.length === 5) love.id = 'hide'
             Array.from(arguments).forEach(e => {
 
                 const p = document.createElement('p');
@@ -293,7 +293,7 @@
               const data = [];
               let i = 0 ;
               let j = 1;
-              const dumy = days
+              const dumy = days;
               // cheak is ramdan or not for to not escape the tow deifrence date
               const isRamadan = ramadan();
 
@@ -301,28 +301,30 @@
              while( i <= j  && j < row.length){
                   const dateI = row[i][1].slice(0,10);
                   const dateJ = row[j][1].slice(0,10);
+
                 //cheak if the user is in the day 
+
                 dumy.delete(dateI);
                 dumy.delete(dateJ);
 
-                if((isRamadan || dateI == dateJ) && row[i][2]== 'in' && row[j][2] == 'out'){
+                if((isRamadan || dateI === dateJ) && row[i][2] === 'in' && row[j][2] === 'out'){
                 data.push([row[i][1] ,row[j][1], row[i][2] , row[j][2]]);
                 i = j+1;
                 j += 2;
                 }
 
-                 else if (( dateI == dateJ) && row[i][2] == 'in' && row[j][2] == 'in') j++;
+                 else if (( dateI === dateJ) && row[i][2] == 'in' && row[j][2] == 'in') j++;
  
                 else{
                 i = j ;
                 j++;
                 }; 
             };
-        return {data , dumy}  ;
+        return {data , dumy} ;
         };
 
-         function calc(inT , outT){
-           return  Math.floor((new Date(outT) - new Date(inT))  / 1000/60)
+         function calculatemMints(inT , outT){
+           return  Math.floor(( new Date(outT) - new Date(inT) )  / 1000 / 60)
         }
 
         const ramadan = () => {
