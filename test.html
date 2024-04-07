@@ -120,29 +120,11 @@
         .error{
         cursor: pointer;
         }
-        @keyframes show {
-        0%{
-            opacity: 0;
-            left: -30px;
-        }
-        20%{
-            left: -20px;
-            opacity: 0.50;
-        }
-       30%,  50%{
-            left: -10px;
-            opacity: 1;
-        }
-        100%{
-            left: 0px;
-        }
-        }
 
     </style>
     <title>CSV File Reader</title>
 </head>
 <body>
-    
     <div class="contof">        
         <button id="getme">تفاصيل اكثر</button>
         <label for="csvFileInput" class="cutstomfile"> اختر ملف
@@ -161,24 +143,20 @@
         </div>
         <div class="date"> </div>
     </div> 
-
     <script>  
        const DATA = {
         '40' : [] , 
         '34' : []
        }  
-       
        const NAMES = {
         '40' : ['علي العطاس' , '300'],
         '34' : ['الكلدي' ,'250'] 
        }
-       // for know how many hourse must to be in time 
+       // many hourse in the normal day and friday 
        const hoursIn = {
         '40' : [9.5 , 3], 
         '34'  : [4 ,0]
        }
-
-       
        // to know if the user was not in the day at all
        const days = new Set() ;
 
@@ -265,9 +243,7 @@
 
            }
             addInHtml( ` الغياب : ${test['dumy'].size}`, `اجمالي الدقائق المحسوبه في  الشهر كله  : ${end}` , `المرتب بحساب الدقائق  : ${getSalary(end,key)}`);
-           }
-          
-           
+           }  
         };
         // add all the resluts in html 
         function addInHtml(text1 , text2,  minutesIn , minutesOut , classname ){
@@ -307,14 +283,12 @@
                 dumy.delete(dateI);
                 dumy.delete(dateJ);
 
-                if((isRamadan || dateI === dateJ) && row[i][2] === 'in' && row[j][2] === 'out'){
+                if(( isRamadan || dateI === dateJ) && row[i][2] === 'in' && row[j][2] === 'out'){
                 data.push([row[i][1] ,row[j][1], row[i][2] , row[j][2]]);
                 i = j+1;
                 j += 2;
                 }
-
-                 else if (( dateI === dateJ) && row[i][2] == 'in' && row[j][2] == 'in') j++;
- 
+                else if (( dateI === dateJ) && row[i][2] == 'in' && row[j][2] == 'in') j++;
                 else{
                 i = j ;
                 j++;
